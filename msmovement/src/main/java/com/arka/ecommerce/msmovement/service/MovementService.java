@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 public class MovementService {
 
     private final MovementRepository repository;
-    private final WebClient webClient;
     private final WebClient inventoryWebClient; 
 
     public Mono<MovementDto> registerMovement(MovementRequest request) {
@@ -36,7 +35,7 @@ public class MovementService {
       if ("OUT".equals(request.getMovementType())) {
     // Consultar stock real en inventory-service
             return inventoryWebClient.get()
-                    .uri("/{productId}/stock", request.getProductId())
+                    .uri("/api/v1/inventory/{productId}/stock", request.getProductId())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, res ->
                         Mono.error(new InsufficientStockException("Producto no encontrado en inventario")))
@@ -57,7 +56,7 @@ public class MovementService {
       
 
     return inventoryWebClient.post()
-        .uri("/update")
+        .uri("/api/v1/inventory/update")
         .bodyValue(invReq)
         .retrieve()
         .bodyToMono(Void.class) // si update no devuelve nada

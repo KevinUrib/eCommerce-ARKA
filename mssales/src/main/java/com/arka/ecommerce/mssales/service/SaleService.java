@@ -65,7 +65,7 @@ public class SaleService {
 
     private Mono<Void> validateStock(SaleDetailRequest detail) {
         return inventoryWebClient.get()
-                .uri("/{id}/stock", detail.getProductId())
+                .uri("/api/v1/inventory/{id}/stock", detail.getProductId())
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .flatMap(stock -> stock >= detail.getQuantity() ?
@@ -78,8 +78,8 @@ public class SaleService {
                 .uri("/api/v1/movements")
                 .bodyValue(Map.of(
                         "productId", detail.getProductId(),
-                        "movementType", "OUT", // 👈 obligatorio
-                        "delta", -detail.getQuantity(), // 👈 obligatorio (negativo para venta)
+                        "movementType", "OUT", //  obligatorio
+                        "delta", -detail.getQuantity(), //  obligatorio (negativo para venta)
                         "reference", "SALE" // opcional
                 ))
                 .retrieve()
@@ -87,18 +87,17 @@ public class SaleService {
     }
 
 
-
     public Mono<List<AbandonedCartDto>> findAbandonedCarts() {
         return orderWebClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/pending")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/v1/order/pending")
                         .queryParam("olderThanHours", 24)
                         .build())
                 .retrieve()
                 .bodyToFlux(AbandonedCartDto.class)
                 .collectList();
     }
-
 
 
 }

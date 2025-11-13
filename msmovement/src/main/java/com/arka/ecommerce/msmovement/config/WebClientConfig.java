@@ -1,31 +1,23 @@
 package com.arka.ecommerce.msmovement.config;
 
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import org.springframework.context.annotation.*;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.*;
-import reactor.netty.http.client.HttpClient;
-import java.time.Duration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
 
-    @Bean
-    public WebClient webClient(WebClient.Builder builder) {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(5))
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(5)));
 
-        return builder
-                .baseUrl("http://localhost:8084")
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
-    }
+ @Value("${INVENTORY_URL}")
+private String inventoryUrl;
 
-    @Bean
-    public WebClient inventoryWebClient(WebClient.Builder builder) {
-    return builder.baseUrl("http://localhost:8081/api/v1/inventory").build();
+@Bean
+public WebClient inventoryWebClient(WebClient.Builder builder) {
+    return builder.baseUrl(inventoryUrl).build();
+
 }
+
+
+
 }

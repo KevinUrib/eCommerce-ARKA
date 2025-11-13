@@ -1,4 +1,3 @@
-
 server:
   port: 8083
 
@@ -6,29 +5,26 @@ spring:
   application:
     name: sales-service
 
-
-  #r2dbc:
-    #url: r2dbc:postgresql://arkadb.cpeo48mcubi7.us-east-2.rds.amazonaws.com:5432/arka
-    #username: Arkchief_DB
-    #password: Dragunov2020#$
+  main:
+    web-application-type: reactive
 
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/arka
-    username: postgres
-    password: admin123
-
+    url: ${SPRING_R2DBC_URL}
+    username: ${SPRING_R2DBC_USERNAME}
+    password: ${SPRING_R2DBC_PASSWORD}
     pool:
       enabled: true
       initial-size: 5
       max-size: 20
       max-idle-time: 30s
 
+  jackson:
+    serialization:
+      indent_output: true
+
 logging:
   level:
     root: INFO
-    org.springframework.r2dbc: DEBUG
-    io.r2dbc.postgresql.QUERY: DEBUG
-    io.r2dbc.postgresql.PARAM: DEBUG
+    org.springframework.web: DEBUG
     com.arka.ecommerce.msmovement: DEBUG
-
 
