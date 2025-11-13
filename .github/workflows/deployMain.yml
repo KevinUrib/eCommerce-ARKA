@@ -1,0 +1,66 @@
+name: Deploy Microservices to AWS EC2
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPO_PREFIX: ecommerce
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Construcción y subida de imágenes Docker
+      - name: Build and push Docker images to ECR
+        run: |
+          SERVICES=("mscategory" "msproduct" "msinventory" "msmovement" "mssales")
+          for SERVICE in "${SERVICES[@]}"; do
+            IMAGE_URI="${{ steps.ecr.outputs.registry }}/${ECR_REPO_PREFIX}-${SERVICE}:latest"
+            echo "Building and pushing $SERVICE..."
+            docker build -t $IMAGE_URI ./$SERVICE
+            docker push $IMAGE_URI
+          done
+
+      # Despliegue en EC2-1
+      - name: Deploy to EC2-1 (Product Domain)
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_1_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ecommerceArka/catalog
+            docker-compose pull
+            docker-compose up -d
+
+      # Despliegue en EC2-2
+      - name: Deploy to EC2-2 (Sales Domain)
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ecommerceArka/inventory
+            docker-compose pull
+            docker-compose up -d
+
+
