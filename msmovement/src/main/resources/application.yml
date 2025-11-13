@@ -31,7 +31,7 @@ logging:
 # URLs de otros microservicios (solo para referencia local)
 services:
   inventory:   
-    url: http://msinventory:8081/api/v1/inventory
+    url: http://msinventory:8082/api/v1/inventory
   sales:
     url: http://mssales:8083/api/v1/sales
   order:

@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
 
- @Value("${INVENTORY_URL}")
+@Value("${INVENTORY_URL}")
 private String inventoryUrl;
 
 @Bean
