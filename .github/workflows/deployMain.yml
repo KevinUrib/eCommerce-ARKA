@@ -31,7 +31,7 @@ jobs:
       # Construcción y subida de imágenes Docker
       - name: Build and push Docker images to ECR
         run: |
-          SERVICES=("category-service" "product-service" "inventory-service" "movement-service" "sales-service" "order-service" "notification-service")
+          SERVICES=("mscategory" "msproduct" "msinventory" "msmovement" "mssales")
           for SERVICE in "${SERVICES[@]}"; do
             IMAGE_URI="${{ steps.ecr.outputs.registry }}/${ECR_REPO_PREFIX}-${SERVICE}:latest"
             echo "Building and pushing $SERVICE..."
